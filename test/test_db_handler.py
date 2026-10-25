@@ -1,9 +1,11 @@
-# test_db_handler.py
+# ------------------------ Modules ------------------------
+# Libraries=>
 import pytest
 from unittest.mock import patch, MagicMock
+# Modules=>
 from src.connection.db_handler import SQLConnection
 
-
+# ------------------------ test ------------------------
 def test_sql_connection_windows_auth():
     """Testing initialization and URL construction for Windows Authentication mode"""
     db = SQLConnection(
