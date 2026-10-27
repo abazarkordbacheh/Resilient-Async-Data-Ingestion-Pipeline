@@ -9,7 +9,8 @@ logger = logging.getLogger(__name__)
 
 
 class RetryWorker:
-    """Background worker responsible for handling failed database batch insertions.
+    """
+    Background worker responsible for handling failed database batch insertions.
 
     Utilizes an asynchronous queue to process failed batch IDs in the background
     without blocking the main ingestion pipeline. It resets the remote batch pointer

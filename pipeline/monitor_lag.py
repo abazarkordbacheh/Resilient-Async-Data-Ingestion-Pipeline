@@ -1,7 +1,10 @@
-# monitor_lag.py
+# ------------------------ Modules ------------------------
+# Libraries=>
 import asyncio
 import logging
 import httpx
+
+# ------------------------ Monitoring ------------------------
 
 async def monitor_lag_forever(base_url: str, token_getter, poll_seconds: int, client: httpx.AsyncClient):
     base_url = base_url.rstrip("/")
