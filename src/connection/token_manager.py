@@ -4,6 +4,12 @@ import time
 import httpx
 import logging
 
+# endregion
+
+
+# region Configure Logger...
+logger = logging.getLogger(__name__)
+
 
 # endregion
 
@@ -19,7 +25,6 @@ class TokenManager:
     def __init__(self, base_url: str, username: str, password: str, token_ttl_seconds: int):
         """
         Initializes the TokenManager.
-
         :param base_url: Base URL of the target web service (trailing slashes are stripped).
         :param username: Username for authentication.
         :param password: Password for authentication.
@@ -41,22 +46,21 @@ class TokenManager:
         :return: True if the token is present and within TTL, False otherwise.
         """
         if not self._token:
+            logger.info("TokenManager: token is not present.")
             return False
         return (time.time() - self._fetched_at) < self._ttl
 
     async def get_valid_token(self, client: httpx.AsyncClient) -> str:
         """
         Retrieves a valid JWT access token, utilizing cache or refreshing if needed.
-       Thread-safe / async-safe using double-checked locking to prevent duplicate
-       simultaneous login requests.
-
-       :param client: An active `httpx.AsyncClient` instance for making requests.
-
-       :return: A valid JWT access token string.
-
-       :raise: RuntimeError: If authentication fails or response is malformed.
-       """
+        Thread-safe / async-safe using double-checked locking to prevent duplicate
+        simultaneous login requests.
+        :param client: An active `httpx.AsyncClient` instance for making requests.
+        :return: A valid JWT access token string.
+        :raise: RuntimeError: If authentication fails or response is malformed.
+        """
         if self._is_valid():
+            logger.info("TokenManager: token is valid.")
             return self._token  # type: ignore
 
         async with self._lock:
@@ -65,13 +69,13 @@ class TokenManager:
                 return self._token  # type: ignore
 
             await self._login(client)
+            logger.info("TokenManager: token is valid.")
             return self._token  # type: ignore
 
     async def _login(self, client: httpx.AsyncClient) -> None:
         """
         Authenticates against the `/jwt_login/` endpoint and updates the token cache.
         :param client: An active `httpx.AsyncClient` instance.
-
         :raise:RuntimeError: If HTTP status code is not 200 or response lacks 'access' token.
         """
         url = f"{self.base_url}/jwt_login/"
